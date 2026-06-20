@@ -1,0 +1,3 @@
+class PhonebookEntryRepository {
+  getAllPhonebookEntries() {}
+}
