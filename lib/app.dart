@@ -38,9 +38,22 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Generic Phonebook App")),
-      body: const Center(
-        child: Text("Hello World!"),
+      body: Center(
+        child: Column(
+          children: buildPhonebookEntryList(phonebookEntries),
+        ),
       ),
     );
+  }
+
+  List<Widget> buildPhonebookEntryList(List<PhonebookEntry> phonebookEntries) {
+    return phonebookEntries
+            .map(
+              (entry) => Row(
+                children: [Text(entry.name)],
+              ),
+            )
+            .toList()
+        as List<Widget>;
   }
 }

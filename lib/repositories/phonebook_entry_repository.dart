@@ -9,7 +9,7 @@ class PhonebookEntryRepository {
   }
 
   Future<List<PhonebookEntry>> getAllPhonebookEntries() async {
-    List<Map<String, dynamic>> response = await http.get("PhonebookEntry");
+    List<Map<String, dynamic>> response = await http.get("api/PhonebookEntry");
     var phonebookEntries = response
         .map((entry) => PhonebookEntry.fromJson(entry))
         .toList();
@@ -17,7 +17,7 @@ class PhonebookEntryRepository {
   }
 
   Future<PhonebookEntry?> getPhonebookEntry(int id) async {
-    var response = await http.get("PhonebookEntry/$id");
+    var response = await http.get("api/PhonebookEntry/$id");
     if (response == null) {
       return null;
     }
@@ -26,17 +26,17 @@ class PhonebookEntryRepository {
   }
 
   void addPhonebookEntry(PhonebookEntry phonebookEntry) async {
-    await http.post("PhonebookEntry", phonebookEntry.toJson());
+    await http.post("api/PhonebookEntry", phonebookEntry.toJson());
   }
 
   void updatePhonebookEntry(PhonebookEntry phonebookEntry) async {
     await http.put(
-      "PhonebookEntry/${phonebookEntry.id}",
+      "api/PhonebookEntry/${phonebookEntry.id}",
       phonebookEntry.toJson(),
     );
   }
 
   void deletePhonebookEntry(PhonebookEntry phonebookEntry) async {
-    await http.delete("PhonebookEntry/${phonebookEntry.id}");
+    await http.delete("api/PhonebookEntry/${phonebookEntry.id}");
   }
 }
