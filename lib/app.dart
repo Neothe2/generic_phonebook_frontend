@@ -44,17 +44,17 @@ class _AppState extends State<App> {
             "Are you sure you want to cancel? You'll lose the data that you entered.",
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text("No, take me back"),
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
               child: Text("Yes, cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text("No, take me back"),
             ),
           ],
         );
@@ -104,12 +104,15 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text("Generic Phonebook App"),
-        actions: [buildAppBarAddButton()],
+        actions: [buildAddEntryButton()],
       ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [buildEntryList()],
         ),
       ),
@@ -151,68 +154,107 @@ class _AppState extends State<App> {
 
   Widget buildEntryList() {
     var headingStyle = TextStyle(fontWeight: FontWeight.bold);
-    return SingleChildScrollView(
-      child: DataTable(
-        dataRowMaxHeight: double.infinity,
-        columns: [
-          DataColumn(label: Text("Name", style: headingStyle)),
-          DataColumn(label: Text("Phone Number", style: headingStyle)),
-          DataColumn(label: Text("Address", style: headingStyle)),
-          DataColumn(label: Text("Actions", style: headingStyle)),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.6,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black12, width: 2),
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 0),
+            blurRadius: 20,
+            // blurStyle: BlurStyle.normal,
+          ),
         ],
-        rows: [
-          ...phonebookEntries.map((PhonebookEntry entry) {
-            return DataRow(
-              cells: [
-                DataCell(Text(entry.name)),
-                DataCell(Text(entry.phoneNumber)),
-                DataCell(
-                  Container(
-                    constraints: BoxConstraints(maxWidth: 250),
-                    child: Text(
-                      entry.address,
-                      // softWrap: true,
+      ),
+      child: SingleChildScrollView(
+        child: DataTable(
+          dataRowMaxHeight: double.infinity,
+          columns: [
+            DataColumn(label: Text("Name", style: headingStyle)),
+            DataColumn(label: Text("Phone Number", style: headingStyle)),
+            DataColumn(label: Text("Address", style: headingStyle)),
+            DataColumn(label: Text("Actions", style: headingStyle)),
+          ],
+          rows: [
+            ...phonebookEntries.map((PhonebookEntry entry) {
+              return DataRow(
+                cells: [
+                  DataCell(Text(entry.name)),
+                  DataCell(Text(entry.phoneNumber)),
+                  DataCell(
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 250),
+                      child: Text(
+                        entry.address,
+                        // softWrap: true,
+                      ),
                     ),
                   ),
-                ),
-                DataCell(
-                  Row(
-                    children: [
-                      Icon(Icons.edit),
-                      IconButton(
-                        onPressed: () {
-                          showDeleteConfirmDialog(entry).then((bool result) {
-                            print(result);
-                            if (result) {
-                              phonebookEntryRepository.deletePhonebookEntry(
-                                entry,
-                              );
-                              setState(() {
-                                phonebookEntries.remove(entry);
-                                getPhonebookEntries();
-                              });
-                            }
-                          });
-                        },
-                        icon: Icon(Icons.delete),
-                      ),
-                    ],
+                  DataCell(
+                    Row(
+                      children: [
+                        Icon(Icons.edit),
+                        IconButton(
+                          onPressed: () {
+                            showDeleteConfirmDialog(entry).then((bool result) {
+                              print(result);
+                              if (result) {
+                                phonebookEntryRepository.deletePhonebookEntry(
+                                  entry,
+                                );
+                                setState(() {
+                                  phonebookEntries.remove(entry);
+                                  getPhonebookEntries();
+                                });
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.delete),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
-        ],
+                ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildAppBarAddButton() {
-    return ElevatedButton(
-      child: Text("Add"),
-      onPressed: () async {
-        await showAddEntryModal();
-      },
+  Widget buildAddEntryButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          // minimumSize: const Size(150, 48),
+          padding: EdgeInsets.all(15),
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          textStyle: const TextStyle(fontSize: 18),
+        ),
+        onPressed: () async {
+          await showAddEntryModal();
+        },
+        // 1. Define the icon here
+        icon: const Icon(
+          Icons.add,
+          size: 25,
+        ),
+        // 2. Define the text here
+        label: const Text("Add Entry"),
+
+        // 3. OPTIONAL: If you want the icon on the right side!
+        // (Note: This requires Flutter 3.16 or newer)
+        iconAlignment: IconAlignment.end,
+      ),
     );
   }
 
