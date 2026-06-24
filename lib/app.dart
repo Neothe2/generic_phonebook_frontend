@@ -63,7 +63,42 @@ class _AppState extends State<App> {
     if (response is! bool) {
       return false;
     }
-    return true;
+    return response;
+  }
+
+  Future<void> showAddEntryModal() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Add Phonebook Entry"),
+          content: Column(
+            children: [
+              TextField(
+                controller: nameController,
+              ),
+              TextField(
+                controller: phoneNumberController,
+              ),
+              TextField(
+                controller: addressController,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                var response = await showCancelModal();
+                if (!context.mounted) return;
+                if (response) Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(onPressed: () {}, child: Text("Add")),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -173,7 +208,12 @@ class _AppState extends State<App> {
   }
 
   Widget buildAppBarAddButton() {
-    return ElevatedButton(child: Text("Add"), onPressed: () {});
+    return ElevatedButton(
+      child: Text("Add"),
+      onPressed: () async {
+        await showAddEntryModal();
+      },
+    );
   }
 
   List<Widget> buildPhonebookEntryList(List<PhonebookEntry> phonebookEntries) {
