@@ -13,6 +13,11 @@ class _AppState extends State<App> {
   late PhonebookEntryRepository phonebookEntryRepository;
 
   List<PhonebookEntry> phonebookEntries = [];
+
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +32,38 @@ class _AppState extends State<App> {
     for (var phonebookEntry in phonebookEntries) {
       print(phonebookEntry.name);
     }
+  }
+
+  Future<bool> showCancelModal() async {
+    var response = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Cancel?"),
+          content: Text(
+            "Are you sure you want to cancel? You'll lose the data that you entered.",
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text("Yes, cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text("No, take me back"),
+            ),
+          ],
+        );
+      },
+    );
+    if (response is! bool) {
+      return false;
+    }
+    return true;
   }
 
   @override
