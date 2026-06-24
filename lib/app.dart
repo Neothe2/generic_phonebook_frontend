@@ -13,47 +13,165 @@ class _AppState extends State<App> {
   late PhonebookEntryRepository phonebookEntryRepository;
 
   List<PhonebookEntry> phonebookEntries = [];
-
   @override
   void initState() {
     super.initState();
     phonebookEntryRepository = PhonebookEntryRepository();
-    getPhonebookEntries();
+    getPhonebookEntries().then(
+      (List<PhonebookEntry> entries) => {
+        setState(() {
+          phonebookEntries = entries;
+        }),
+      },
+    );
     for (var phonebookEntry in phonebookEntries) {
       print(phonebookEntry.name);
     }
   }
 
-  void getPhonebookEntries() async {
-    var entries = await phonebookEntryRepository.getAllPhonebookEntries();
-
-    if (!context.mounted) return;
-
-    setState(() async {
-      phonebookEntries = entries;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Generic Phonebook App")),
+      appBar: AppBar(
+        title: Text("Generic Phonebook App"),
+        actions: [buildAppBarAddButton()],
+      ),
       body: Center(
         child: Column(
-          children: buildPhonebookEntryList(phonebookEntries),
+          children: [buildEntryList()],
         ),
       ),
     );
   }
 
+  Future<bool> showDeleteConfirmDialog(PhonebookEntry phonebookEntry) async {
+    bool? response = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete ${phonebookEntry.name}?"),
+          content: Text(
+            "Are you sure you want to delete the entry for ${phonebookEntry.name}? This action is irreversible.",
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (response is! bool) {
+      return false;
+    }
+    return response;
+  }
+
+  Widget buildEntryList() {
+    var headingStyle = TextStyle(fontWeight: FontWeight.bold);
+    return SingleChildScrollView(
+      child: DataTable(
+        dataRowMaxHeight: double.infinity,
+        columns: [
+          DataColumn(label: Text("Name", style: headingStyle)),
+          DataColumn(label: Text("Phone Number", style: headingStyle)),
+          DataColumn(label: Text("Address", style: headingStyle)),
+          DataColumn(label: Text("Actions", style: headingStyle)),
+        ],
+        rows: [
+          ...phonebookEntries.map((PhonebookEntry entry) {
+            return DataRow(
+              cells: [
+                DataCell(Text(entry.name)),
+                DataCell(Text(entry.phoneNumber)),
+                DataCell(
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 250),
+                    child: Text(
+                      entry.address,
+                      // softWrap: true,
+                    ),
+                  ),
+                ),
+                DataCell(
+                  Row(
+                    children: [
+                      Icon(Icons.edit),
+                      IconButton(
+                        onPressed: () {
+                          showDeleteConfirmDialog(entry).then((bool result) {
+                            print(result);
+                            if (result) {
+                              phonebookEntryRepository.deletePhonebookEntry(
+                                entry,
+                              );
+                              setState(() {
+                                phonebookEntries.remove(entry);
+                                getPhonebookEntries();
+                              });
+                            }
+                          });
+                        },
+                        icon: Icon(Icons.delete),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget buildAppBarAddButton() {
+    return ElevatedButton(child: Text("Add"), onPressed: () {});
+  }
+
   List<Widget> buildPhonebookEntryList(List<PhonebookEntry> phonebookEntries) {
     return phonebookEntries
             .map(
-              (entry) => Row(
-                children: [Text(entry.name)],
+              (entry) => Container(
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 2),
+                ),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(entry.name),
+                    Text(entry.phoneNumber),
+                    Text(entry.address),
+                    Row(
+                      spacing: 10,
+                      children: [
+                        Icon(Icons.edit),
+                        Icon(Icons.delete),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             )
             .toList()
         as List<Widget>;
+  }
+
+  Future<List<PhonebookEntry>> getPhonebookEntries() async {
+    var entries = await phonebookEntryRepository.getAllPhonebookEntries();
+    return entries;
   }
 }

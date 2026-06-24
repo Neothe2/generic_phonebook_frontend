@@ -9,7 +9,7 @@ class PhonebookEntryRepository {
   }
 
   Future<List<PhonebookEntry>> getAllPhonebookEntries() async {
-    List<Map<String, dynamic>> response = await http.get("api/PhonebookEntry");
+    List<dynamic> response = (await http.get("api/PhonebookEntry"));
     var phonebookEntries = response
         .map((entry) => PhonebookEntry.fromJson(entry))
         .toList();
