@@ -1,4 +1,5 @@
 import 'package:generic_phonebook_frontend/models/phonebook_entry.dart';
+import 'package:generic_phonebook_frontend/models/phonebook_entry_draft.dart';
 import 'package:generic_phonebook_frontend/repositories/http_service.dart';
 
 class PhonebookEntryRepository {
@@ -25,7 +26,7 @@ class PhonebookEntryRepository {
     return phonebookEntry;
   }
 
-  void addPhonebookEntry(PhonebookEntry phonebookEntry) async {
+  void addPhonebookEntry(PhonebookEntryDraft phonebookEntry) async {
     await http.post("api/PhonebookEntry", phonebookEntry.toJson());
   }
 

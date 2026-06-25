@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:generic_phonebook_frontend/models/phonebook_entry.dart';
 import 'package:generic_phonebook_frontend/repositories/phonebook_entry_repository.dart';
+import 'package:generic_phonebook_frontend/widgets/stylish_text_field.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -71,26 +72,34 @@ class _AppState extends State<App> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
           title: Text("Add Phonebook Entry"),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
             children: [
-              TextField(
+              StylishTextField(
                 controller: nameController,
+                label: "Full Name",
               ),
-              TextField(
+              StylishTextField(
                 controller: phoneNumberController,
+                label: "Phone Number",
               ),
-              TextField(
+              StylishTextField(
                 controller: addressController,
+                label: "Address",
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () async {
-                var response = await showCancelModal();
-                if (!context.mounted) return;
-                if (response) Navigator.of(context).pop();
+                // var response = await showCancelModal();
+                // if (!context.mounted) return;
+                // if (response) Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
               child: Text("Cancel"),
             ),
