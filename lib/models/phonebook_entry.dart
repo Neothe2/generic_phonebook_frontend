@@ -1,3 +1,5 @@
+import 'package:generic_phonebook_frontend/models/phonebook_entry_draft.dart';
+
 class PhonebookEntry {
   int id;
   String name;
@@ -27,5 +29,19 @@ class PhonebookEntry {
       'adress': address,
       'phoneNumber': phoneNumber,
     };
+  }
+
+  void update(PhonebookEntryDraft draft) {
+    name = draft.name;
+    phoneNumber = draft.phoneNumber;
+    address = draft.address;
+  }
+
+  PhonebookEntryDraft toDraft() {
+    return PhonebookEntryDraft(
+      name: name,
+      phoneNumber: phoneNumber,
+      address: address,
+    );
   }
 }
